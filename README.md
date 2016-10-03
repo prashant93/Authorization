@@ -9,7 +9,9 @@ Import databse project and create database to configure user Roles.
 
 Add your connection string.
 
-Add your Federation Medata URL, Application URL and API Name in web.confif App Sesttings.
+Add your Federation Medata URL, Application URL and API Name in web.config App Sesttings.
+
+For more check out the documentation
 
 
 
