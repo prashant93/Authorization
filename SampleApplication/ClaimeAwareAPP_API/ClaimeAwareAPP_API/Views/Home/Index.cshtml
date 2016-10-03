@@ -1,0 +1,122 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="well well-lg">
+    <div style="padding:40px;">
+        <h3>Portfolio Entry</h3>
+        <button class="btn btn-info" type="button" title="Anonymous User can Add new PM" onclick="AddNewPM('portfolioTable');">
+            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>  ADD
+        </button>
+        <table class="table" id="portfolioTable">
+            <colgroup>
+                <col class="col-md-2">
+                <col class="col-md-3">
+                <col class="col-md-3">
+                <col class="col-md-4">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>PM ID</th>
+                    <th>PM NAME</th>
+                    <th>PM Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="identity">1</td>
+                    <td>Prashant Panigrahi</td>
+                    <td>ppanigrahi@example.com</td>
+                    <td>
+                        <button class="btn btn-danger" title="User having Trader Role can Delete PM" id="Save" type="button" onclick="CallWebAPI()">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>  DELETE
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p><span id="header"></span> <button type="button" class="close" data-dismiss="modal">&times;</button></p>
+            </div>
+            <div class="modal-body" id="message" style="overflow-y:auto">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+   
+    function Add(portfolioTable) {
+        var table = document.getElementById(portfolioTable);
+
+        var rowCount = table.rows.length;
+        var row = table.insertRow(rowCount);
+        console.log(rowCount);
+        var cell1 = row.insertCell(0);
+        var element1 = document.createElement("td");
+        cell1.innerHTML = rowCount;
+
+        var cell2 = row.insertCell(1);
+        cell2.innerHTML = "Naveed Khan";
+
+        var cell3 = row.insertCell(2);
+        cell3.innerHTML = "nKhan@example.com";
+
+        var cell4 = row.insertCell(3);
+        var element1 = document.createElement("button");
+        element1.type = "button";
+        element1.className = "btn btn-danger";
+        element1.innerHTML = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> DELETE ';
+        //element1.setAttribute("onclick", CallWebAPI());
+        cell4.appendChild(element1);
+    }
+    //Add new Portfolio 
+    function AddNewPM(portfolioTable) {
+        $.ajax({
+            url: 'https://wvm5055/ClaimAwareAPP/api/pm/',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                //document.getElementById("portfolioTable").deleteRow(1);
+                Add(portfolioTable);
+                $('#message').html(data);
+                $('#myModal').modal('show');
+            },
+            error: function (responseMessage) {
+                console.log(responseMessage);
+                $('#message').html(responseMessage.responseJSON.ExceptionMessage);
+                $('#myModal').modal('show');
+            }
+        });
+    }
+    //Portfolio delete 
+    function CallWebAPI() {
+        var identity = $('#identity').html();                
+        $.ajax({
+            url: 'https://wvm5055/ClaimAwareAPP/api/pm/' + identity,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                document.getElementById("portfolioTable").deleteRow(identity);
+                $('#message').html(data);
+                $('#header').html("ADFS Demo");
+                $('#myModal').modal('show');
+            },
+            error: function (responseMessage) {
+                $('#message').html(responseMessage.responseJSON.ExceptionMessage);
+                $('#header').html("ADFS Demo");
+                if (responseMessage.status == 403) {
+                    $('#header').html("Access Denied");
+                }               
+
+                $('#myModal').modal('show');
+            }
+        });
+    }
+</script>

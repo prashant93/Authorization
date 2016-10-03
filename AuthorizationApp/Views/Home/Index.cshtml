@@ -1,0 +1,333 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permission</title>
+
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/config.js"></script>
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+
+    @* custom css *@
+    <style>
+        body {
+            margin: 15px;
+        }
+
+        /* text recolor */
+        h1, p, a {
+            color: #4DC9C9 !important;
+        }
+
+        /* button recolor */
+        .nav-pills > li.active > a, .btn-primary {
+            background-color: #6C6C6C !important;
+            border-color: #6C6C6C !important;
+        }
+
+        .form-control, .nav-pills > li > a,
+        .btn {
+            border-radius: 0px;
+        }
+
+        .table thead > tr > th {
+            vertical-align: middle;
+            color: #4DC9C9 !important;
+            background-color: #6C6C6C !important;
+        }
+
+        .table {
+            border-color: #6C6C6C !important;
+        }
+
+        .form-horizontal {
+            color: #6C6C6C !important;
+        }
+
+        legend {
+            color: #4DC9C9 !important;
+        }
+
+        .table tbody,
+        .form-group {
+            font-size: 12px;
+        }
+
+            .table tbody tr td,
+            .table thead tr th {
+                padding: 4px;
+            }
+
+        #alert {
+            padding: 20px;
+            width: 100%;
+            background-color: #4DC9C9;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container table-bordered" ng-app="authorization" ng-controller="permissionController">
+
+        @* Header *@
+        <div class="page-header">
+            <h1>Permissions</h1>
+        </div>
+
+        <div class="container">
+
+            <div class="row">
+
+                @* Tab Navigation *@
+                <div class="col-md-2">
+                    <ul class="nav nav-pills nav-stacked">
+                        <li ng-class="{ active: isSet(1) }">
+                            <a href="#" ng-click="setTab(1)">Application Role</a>
+                        </li>
+                        <li ng-class="{ active: isSet(2) }">
+                            <a href="#" ng-click="setTab(2)">User Role</a>
+                        </li>
+                    </ul>
+                </div>
+
+                @* Tab Screen *@
+                <div class="col-md-10">
+
+                    <div class="well" style="overflow:auto;border-radius: 0px;">
+
+                        @* Application Role *@
+                        <div ng-show="isSet(1)">
+                            <div>
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="selectbasic">ApplicationName</label>
+                                        <div class="col-md-4">
+
+                                            <select id="showApplication" name="showapplication" class="form-control" ng-model="getApplication" ng-change="showApplication()">
+                                                <option value="" selected="selected">---Select Application---</option>
+                                                <option ng-repeat="item in applications  track by item.Id" value="{{item.Id}}">{{item.ApplicationName}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div ng-show="review.length!=0" id="approle">
+                                    <table class="table table-bordered table-striped table-responsive" ng-show="permissions.length!=0">
+                                        <thead>
+                                            <tr>
+                                                <th class="col-md-1">Sr. No.</th>
+                                                <th>Roles</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="permission in permissions | orderBy : 'ApplicationName'">
+
+                                                <td>{{$index + 1 }}</td>
+                                                <td>{{permission.RoleName}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div ng-hide="permissions.length!=0">
+                                        <div class="col-md-12 " id="alert">
+                                            <span class="glyphicon glyphicon-info-sign"></span> <span>No Roles found for Applicaiton</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* User Role *@
+                        <div ng-show="isSet(2)">
+                            <form class="form-horizontal" ng-submit="getRoles()">
+                                <fieldset>
+                                    <legend>Find User Roles:</legend>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="UserName">UserName</label>
+                                        <div class="col-md-4">
+                                            <input id="UserName" name="UserName" type="text" placeholder="e.g. ppanigrahi or ppanigrahi@domain.com" class="form-control input-md" ng-model="username" required="">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="selectbasic">ApplicationName</label>
+                                        <div class="col-md-4">
+                                            <select id="selectApplication" name="application" class="form-control" ng-model="selectedApplication">
+                                                <option value="">---Select Application---</option>
+                                                <option ng-repeat="item in applications track by item.Id" value="{{item.Id}}">{{item.ApplicationName}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="domainname">DomainName</label>
+                                        <div class="col-md-4">
+                                            <input id="domainname" name="domainname" type="text" placeholder="e.g. merilent.com" class="form-control input-md" ng-model="domainname" required="">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="domainname"></label>
+                                        <div class="col-md-4">
+                                            <button id="rolesbutton" name="rolesbutton" type="submit" class="btn btn-primary">Roles</button>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+                            <fieldset ng-show="roles.length!=0">
+                                <legend>AD Roles</legend>
+                                <div ng-hide="roles.ADRoles.length!=0">
+                                    <div class="col-md-12 " id="alert">
+                                        <span class="glyphicon glyphicon-info-sign"></span> <span>No AD roles found</span>
+                                    </div>
+                                </div>
+                                <table class="table table-bordered table-striped table-responsive" ng-show="roles.ADRoles.length!=0">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-md-1">Sr. No.</th>
+                                            <th>User Roles</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="role in roles.ADRoles">
+                                            <td>{{$index + 1}}</td>
+                                            <td>{{role}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </fieldset>
+                            <fieldset ng-show="roles.length!=0">
+                                <legend>Application Roles</legend>
+
+                                <div ng-hide="roles.ApplicationRoles.length!=0">
+                                    <div class="col-md-12 " id="alert">
+                                        <span class="glyphicon glyphicon-info-sign"></span> <span>No Application roles found</span>
+                                    </div>
+                                </div>
+
+                                <table class="table table-bordered table-striped table-responsive" ng-show="roles.ApplicationRoles.length!=0">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-md-1">Sr. No.</th>
+                                            <th>User Roles</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="role in roles.ApplicationRoles">
+                                            <td>{{$index + 1}}</td>
+                                            <td>{{role}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* modal *@
+        <div class="modal" id="myModal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <p><span id="header"></span> <button type="button" class="close" data-dismiss="modal">&times;</button></p>
+                    </div>
+                    <div class="modal-body" id="message" style="overflow-y:auto">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Scripts *@
+    <script>
+        var mainApp = angular.module("authorization", []);
+
+        mainApp.controller('permissionController', function ($scope, $http) {
+
+            var applicationRolesURL = config.serverUrl.ApplicationRolesURL;
+            var userRolesURL = config.serverUrl.UserRolesURL;
+            var applicationURL = config.serverUrl.ApplicationURL;
+
+            $scope.applications = [];
+            $scope.roles = [];
+            $scope.review = [];
+            $scope.permissions = [];
+
+           // tab navigation
+            $scope.tab = 1;
+
+            $scope.setTab = function (newTab) {
+                $scope.tab = newTab;
+            };
+
+            $scope.isSet = function (tabNum) {
+                return $scope.tab === tabNum;
+            };
+
+            // Get All Application from Db configured for ADFS
+            $http({ method: 'GET', dataType: 'json', url: applicationURL })
+                .success(function (response) {
+                    $scope.applications = response;
+                })
+                .error(function (error) {
+                    $('#message').html(error.ExceptionMessage);
+                    $('#myModal').modal('show');
+                })
+
+            // Show ApplicationRoles
+            $scope.showApplication = function () {
+
+                $scope.review = $scope.getApplication;
+
+                if (isNaN($scope.getApplication) || ($scope.getApplication == '')) {
+                    $('#message').html("Please select Applcation");
+                    $('#myModal').modal('show');
+                    return;
+                }
+                $http({ method: 'GET', dataType: 'json', url: applicationRolesURL + '?applicationId=' + $scope.getApplication })
+                        .success(function (response) {
+
+                            $scope.permissions = response;
+
+                        })
+                        .error(function (error) {
+                            $('#message').html(error.ExceptionMessage);
+                            $('#myModal').modal('show');
+                        })
+
+            }
+
+            // Get User Roles from AD and Application
+            $scope.getRoles = function () {
+
+                if (isNaN($scope.selectedApplication) || ($scope.selectedApplication == '')) {
+                    $('#message').html("Please select Applcation");
+                    $('#myModal').modal('show');
+                    return;
+                }
+
+                $http({ method: 'GET', dataType: 'json', url: userRolesURL + '?username=' + $scope.username + '&applicationId=' + $scope.selectedApplication + '&domain=' + $scope.domainname })
+                    .success(function (response) {
+                        $scope.roles = response;
+
+                    })
+                    .error(function (error) {
+                        $('#message').html(error.ExceptionMessage);
+                        $('#myModal').modal('show');
+
+                    })
+            }
+
+        });
+    </script>
+</body>
+</html>
