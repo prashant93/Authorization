@@ -4,7 +4,12 @@ Authorization framework provides the flexibility to authorize user/groups. It ge
 
 ## Getting started ##
 ### Import Database ###
+ 
 Import databse project and create database to configure user Roles.
+
+Add your connection string.
+
+Add your Federation Medata URL, Application URL and API Name in web.confif App Sesttings.
 
 
 
