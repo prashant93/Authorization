@@ -11,7 +11,7 @@ Add your connection string.
 
 Add your Federation Medata URL, Application URL and API Name in web.config App Sesttings.
 
-For more check out the [documentation]()
+For more check out the [documentation](https://github.com/prashant93/Authorization/wiki)
 
 
 
